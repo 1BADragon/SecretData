@@ -1,4 +1,4 @@
-# SecretString
+# SecretData
 Compile time concealment of critical data.
 
 ### Sample:
