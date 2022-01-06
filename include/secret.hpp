@@ -18,6 +18,9 @@
 
 namespace secret {
 
+/**
+ * @brief Simple allocator that zero's out memory before deallocation.
+ */ 
 template <typename T>
 class ZeroAlloc {
 public:
@@ -45,12 +48,21 @@ private:
     std::allocator<T> _alloc;
 };
 
+/**
+ * @brief Secret string data, capable of holding binary data. Should not be used directly.
+ */
 template <std::size_t N>
 class String
 {
 public:
+    /**
+     * @brief Plaintext type. Zero's out memory on destruction.
+     */
     using pt = std::basic_string<char, std::char_traits<char>, ZeroAlloc<char>>;
 
+    /**
+     * @brief Builds a new hidden string out of a string literal
+     */
     constexpr String(const char (&l)[N])
         : _ct()
     {
@@ -64,10 +76,16 @@ public:
         }
     }
 
+    /**
+     * @brief Syntactic sugar for to_pt().
+     */
     pt operator*() const {
         return to_pt();
     }
 
+    /**
+     * @brief Returns a new plaintext container string.
+     */
     pt to_pt() const {
         pt _pt;
 
@@ -87,6 +105,14 @@ private:
     char _ct[N];
 };
 
+/**
+ * @brief Builds a secret string as a constexpr. Resolved at compile time and should
+ * prevent the plaintext string from being contained in the binary. Should double
+ * check... compilers are finicky.
+ *
+ * @param l A string literal to be concealed.
+ * @return A new ObfStr container with the concealed string.
+ */
 template <std::size_t N>
 constexpr auto str(const char (&l)[N])
 {
