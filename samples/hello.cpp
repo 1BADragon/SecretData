@@ -1,8 +1,3 @@
-# SecretString
-Compile time concealment of critical data.
-
-### Sample:
-```c++
 #include <iostream>
 
 #include <secret.hpp>
@@ -13,5 +8,3 @@ int main() {
     std::cout << *s << std::endl;
     return 0;
 }
-```
-
