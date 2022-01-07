@@ -105,6 +105,80 @@ private:
     char _ct[N];
 };
 
+template<typename T, std::size_t N>
+class Array
+{
+public:
+    class pt : public std::array<T, N> {
+    public:
+        ~pt() {
+            std::memset(this->data(), 0, sizeof(T) * N);
+        }
+
+    private:
+        friend class Array;
+        pt() = default;
+    };
+
+    constexpr Array(T const * const l)
+        : _ct() {
+        for (size_t i = 0; i < N; ++i) {
+            _ct[i] = l[i];
+        }
+        conceal();
+    }
+
+    pt operator*() const {
+        return to_pt();
+    }
+
+    pt to_pt() const {
+        pt _pt;
+
+        size_t j = 0;
+
+        for (size_t i = 0; i < N; ++i) {
+            T t = 0;
+            for (size_t k = 0; k < sizeof(T); ++k) {
+                if (j % OBFKEY_LEN == 0) {
+                    j = 0;
+                }
+
+                t |= (OBFKEY[j] << ((sizeof(T) - k) * sizeof(uint8_t)));
+
+                ++j;
+            }
+
+            _pt[i] = _ct[i] ^ t;
+        }
+
+        return _pt;
+    }
+
+public:
+    constexpr void conceal()
+    {
+        size_t j = 0;
+
+        for (auto &at : _ct) {
+            T t = 0;
+            for (size_t k = 0; k < sizeof(T); ++k) {
+                if (j % OBFKEY_LEN == 0) {
+                    j = 0;
+                }
+
+                t |= (OBFKEY[j] << ((sizeof(T) - k) * sizeof(uint8_t)));
+
+                ++j;
+            }
+
+            at = at ^ t;
+        }
+    }
+
+    std::array<T, N> _ct;
+};
+
 /**
  * @brief Builds a secret string as a constexpr. Resolved at compile time and should
  * prevent the plaintext string from being contained in the binary. Should double
@@ -117,6 +191,12 @@ template <std::size_t N>
 constexpr auto str(const char (&l)[N])
 {
     return String<N>(l);
+}
+
+template <typename T, std::size_t N>
+constexpr auto arr(const T (&l)[N])
+{
+    return Array<T, N>(l);
 }
 
 }
