@@ -144,7 +144,7 @@ public:
                     j = 0;
                 }
 
-                t |= (OBFKEY[j] << ((sizeof(T) - k) * sizeof(uint8_t)));
+                t |= (OBFKEY[j] << ((sizeof(T) - k) * 8));
 
                 ++j;
             }
@@ -167,7 +167,7 @@ public:
                     j = 0;
                 }
 
-                t |= (OBFKEY[j] << ((sizeof(T) - k) * sizeof(uint8_t)));
+                t |= (OBFKEY[j] << ((sizeof(T) - k) * 8) - 1);
 
                 ++j;
             }
